@@ -5,6 +5,8 @@
 # ryan.akerley002@umb.edu
 
 from tkinter import *
+from tkinter import filedialog as fd
+from tkinter import messagebox as mbox
 from tkinter import ttk
 import mpsfunc as mf
 from time import sleep
@@ -12,23 +14,28 @@ from time import sleep
 def run_button_pressed():
     mf.set_freq(freq_entry.get())
     mf.set_power(pwr_level.get())
-    print(f"Running at {freq_entry.get()}Hz with {pwr_level.get()}% power for {run_time_var.get()} sec.")
-    rt = int(run_time_var.get())
-    
-    progress['value'] = 25
-    sleep(rt/4)
-    progress['value'] = 50 
-    sleep(rt/4)
-    progress['value'] = 75
-    sleep(rt/4)
-    progress['value'] = 100
-    sleep(rt/4)
+    print(f"Running at {freq_entry.get()}kHz with {pwr_level.get()}% power for {run_time_var.get()} sec.")
+    try:
+        rt = int(run_time_var.get())
+    except ValueError:
+        mbox.showinfo(message='Time value must be a number')
+    else:
+        progress['value'] = 25
+        sleep(rt/4)
+        progress['value'] = 50 
+        sleep(rt/4)
+        progress['value'] = 75
+        sleep(rt/4)
+        progress['value'] = 100
+        sleep(rt/4)
 
-    print('Done')
+        print('Done')
 
 def export_csv():
-    pass
+    filename = fd.asksaveasfilename()
 
+def open_doc():
+    pass
 
 
 main_window = Tk()
@@ -43,6 +50,10 @@ freq_plot = Canvas(data, width=400, height=400, relief='raised', borderwidth='2'
 freq_plot.grid(column=0, columnspan=3, row=0, rowspan=3)
 phase_plot = Canvas(data, width=400, height=400, relief='raised', borderwidth='2')
 phase_plot.grid(column=3, columnspan=3, row=0, rowspan=3)
+
+amps = IntVar()
+amp_label = ttk.Label(data, text=(('current: '+str(amps.get())+' Amps')))
+amp_label.grid(column = 0, row=3, sticky='e')
 data.grid(column=0, row=0)
 
 #*******************************************************
@@ -72,7 +83,7 @@ pwr_incr = ttk.Label(control, text='%')
 pwr_incr.grid(column=2, row=1, sticky='w', padx=5, pady=2)
 
 # run time entry
-run_time_var = StringVar(value='10')
+run_time_var = StringVar(value='5')
 runtime_lbl = ttk.Label(control, text='Run Time', width=label_width)
 runtime_lbl.grid(column=0, row=2, sticky='w', padx=5, pady=2)
 runtime_entry = ttk.Entry(control, textvariable=run_time_var, width=widget_width, justify='right')
@@ -100,10 +111,23 @@ main_window['menu'] = menubar
 file_menu = Menu(menubar)
 menubar.add_cascade(menu=file_menu, label='File')
 file_menu.add_command(label='Export as CSV', command=export_csv)
+file_menu.add_command(label='Quit', command=main_window.destroy)
 
 # The help menu
-help_menu = Menu(menubar)
+help_menu = Menu(menubar, name='help')
 menubar.add_cascade(menu=help_menu, label='Help')
+help_menu.add_command(label='Documentation', command=open_doc)
+
+# Context menu
+context_menu = Menu(main_window)
+context_menu.add_command(label = 'Export to CSV', command=export_csv)
+if(main_window.tk.call('tk', 'windowingsystem')=='aqua'):
+    main_window.bind('<2>', lambda e: context_menu.post(e.x_root, e.y_root))
+    main_window.bind('<Control-1>', lambda e: context_menu.post(e.x_root, e.y_root))
+else:
+    main_window.bind('<3>', lambda e: context_menu.post(e.x_root, e.y_root))
+
+
 
 main_window.columnconfigure(0, weight=1)
 main_window.rowconfigure(0, weight=1)
