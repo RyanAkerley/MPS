@@ -12,22 +12,21 @@ import mpsfunc as mf
 from time import sleep
 
 def run_button_pressed():
-    mf.set_freq(freq_entry.get())
-    mf.set_power(pwr_level.get())
-    print(f"Running at {freq_entry.get()}kHz with {pwr_level.get()}% power for {run_time_var.get()} sec.")
     try:
-        rt = int(run_time_var.get())
+        mf.set_freq(freq_entry.get())
+        mf.set_power(st_pwr_level.get())
+        pwr_start = int(st_pwr_level.get())
+        pwr_end = int(end_pwr_level.get())
+        pwr_step = int(pwr_step_level.get())
+        print(f"Running at {freq_entry.get()}kHz from {st_pwr_level.get()}% power to {end_pwr_level.get()}% in \
+                {pwr_step_level.get()}% increments.")
     except ValueError:
-        mbox.showinfo(message='Time value must be a number')
+        print('Values must be numbers')
     else:
-        progress['value'] = 25
-        sleep(rt/4)
-        progress['value'] = 50 
-        sleep(rt/4)
-        progress['value'] = 75
-        sleep(rt/4)
-        progress['value'] = 100
-        sleep(rt/4)
+        for i in range(pwr_start, pwr_end, pwr_step):
+            mf.set_power(i)            
+            sleep(1)
+            progress['value'] = 100*i/(pwr_end - pwr_start) 
 
         print('Done')
 
@@ -45,16 +44,46 @@ main_window.option_add('*tearOff', FALSE)
 #*****************************************************
 # The data display area
 #******************************************************
+
+
 data = ttk.Frame(main_window)
-freq_plot = Canvas(data, width=400, height=400, relief='raised', borderwidth='2')
-freq_plot.grid(column=0, columnspan=3, row=0, rowspan=3)
-phase_plot = Canvas(data, width=400, height=400, relief='raised', borderwidth='2')
-phase_plot.grid(column=3, columnspan=3, row=0, rowspan=3)
+
+freq_plot_label = ttk.Label(data, text='Frequency')
+freq_plot_label.grid(column=1, row=0, sticky='ew', padx=5, pady=5)
+freq_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
+freq_plot.grid(column=0, columnspan=3, row=1, rowspan=3)
+freq_img = PhotoImage(file='freq.png')
+freq_plot.create_image(20, 20, anchor=NW, image=freq_img)
+
+phase_plot_label = ttk.Label(data, text='Phase')
+phase_plot_label.grid(column=4, row=0, sticky='ew', padx=5, pady=5)
+phase_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
+phase_plot.grid(column=3, columnspan=3, row=1, rowspan=3)
+phase_img = PhotoImage(file='phase.png')
+phase_plot.create_image(20, 20, anchor=NW, image=phase_img)
+
+mag_plot_label = ttk.Label(data, text='Magnetization')
+mag_plot_label.grid(column=1, row=4, sticky='ew', padx=5, pady=5)
+mag_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
+mag_plot.grid(column=0, columnspan=3, row=5, rowspan=3)
+mag_img = PhotoImage(file='magnetization.png')
+mag_plot.create_image(20, 20, anchor=NW, image=mag_img)
+
+field_plot_label = ttk.Label(data, text='Excitation Field')
+field_plot_label.grid(column=4, row=4, sticky='ew', padx=5, pady=5)
+field_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
+field_plot.grid(column=3, columnspan=3, row=5, rowspan=3)
+field_img = PhotoImage(file='excitation_field.png')
+field_plot.create_image(20, 20, anchor=NW, image=field_img)
 
 amps = IntVar()
 amp_label = ttk.Label(data, text=(('current: '+str(amps.get())+' Amps')))
-amp_label.grid(column = 0, row=3, sticky='e')
+amp_label.grid(column = 0, row=8, padx=5, pady=5, sticky='e')
+ex_field = IntVar()
+field_label = ttk.Label(data, text=(('excitation field: '+str(ex_field.get())+' mT')))
+field_label.grid(column = 3, row=8, padx=5, pady=5, sticky='e')
 data.grid(column=0, row=0)
+
 
 #*******************************************************
 # Control Area
@@ -73,30 +102,40 @@ freq_entry.grid(column=1, row=0, sticky='w', padx=5, pady=2)
 freq_incr = ttk.Label(control, text='kHz')
 freq_incr.grid(column=2, row=0, sticky='w', padx=5, pady=2)
 
-# power entry
-pwr_level = StringVar(value='50')
-pwr_lbl = ttk.Label(control, text='Drive Power', width=label_width)
-pwr_lbl.grid(column=0, row=1, sticky='w', padx=5, pady=2)
-pwr_entry = ttk.Entry(control, textvariable=pwr_level, width=widget_width, justify='right')
-pwr_entry.grid(column=1, row=1, sticky='w', padx=5, pady=2)
-pwr_incr = ttk.Label(control, text='%')
-pwr_incr.grid(column=2, row=1, sticky='w', padx=5, pady=2)
+# start power entry
+st_pwr_level = StringVar(value='10')
+st_pwr_lbl = ttk.Label(control, text='Start Power', width=label_width)
+st_pwr_lbl.grid(column=0, row=1, sticky='w', padx=5, pady=2)
+st_pwr_entry = ttk.Entry(control, textvariable=st_pwr_level, width=widget_width, justify='right')
+st_pwr_entry.grid(column=1, row=1, sticky='w', padx=5, pady=2)
+st_pwr_incr = ttk.Label(control, text='%')
+st_pwr_incr.grid(column=2, row=1, sticky='w', padx=5, pady=2)
 
-# run time entry
-run_time_var = StringVar(value='5')
-runtime_lbl = ttk.Label(control, text='Run Time', width=label_width)
-runtime_lbl.grid(column=0, row=2, sticky='w', padx=5, pady=2)
-runtime_entry = ttk.Entry(control, textvariable=run_time_var, width=widget_width, justify='right')
-runtime_entry.grid(column=1, row=2, sticky='w', padx=5, pady=2)
-runtime_incr = ttk.Label(control, text='sec')
-runtime_incr.grid(column=2, row=2, sticky='w', padx=5, pady=2)
+# end power entry
+end_pwr_level = StringVar(value='100')
+end_pwr_lbl = ttk.Label(control, text='End Power', width=label_width)
+end_pwr_lbl.grid(column=0, row=2, sticky='w', padx=5, pady=2)
+end_pwr_entry = ttk.Entry(control, textvariable=end_pwr_level, width=widget_width, justify='right')
+end_pwr_entry.grid(column=1, row=2, sticky='w', padx=5, pady=2)
+end_pwr_incr = ttk.Label(control, text='%')
+end_pwr_incr.grid(column=2, row=2, sticky='w', padx=5, pady=2)
+
+# power step entry
+pwr_step_level = StringVar(value='10')
+pwr_step_lbl = ttk.Label(control, text='Power Step', width=label_width)
+pwr_step_lbl.grid(column=0, row=3, sticky='w', padx=5, pady=2)
+pwr_step_entry = ttk.Entry(control, textvariable=pwr_step_level, width=widget_width, justify='right')
+pwr_step_entry.grid(column=1, row=3, sticky='w', padx=5, pady=2)
+pwr_step_incr = ttk.Label(control, text='%')
+pwr_step_incr.grid(column=2, row=3, sticky='w', padx=5, pady=2)
+
 
 # the run button
 run_button = Button(control, command=run_button_pressed, text='Run', width=widget_width)
 run_button.grid(column=3, row=1, padx=5, pady=2, sticky='ew')
 
 progress = ttk.Progressbar(control, orient=HORIZONTAL, mode='determinate', length=400)
-progress.grid(column=0, row=3, padx=5, pady=2, columnspan=4, sticky='ew')
+progress.grid(column=0, row=4, padx=5, pady=2, columnspan=4, sticky='ew')
 
 control.grid(column=0, row=1, sticky='nsew')
 
@@ -132,11 +171,6 @@ else:
 main_window.columnconfigure(0, weight=1)
 main_window.rowconfigure(0, weight=1)
 main_window.rowconfigure(1, weight=0)
-
-
-
-
-
 
 
 
