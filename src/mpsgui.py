@@ -14,18 +14,19 @@ from time import sleep
 def run_button_pressed():
     try:
         mf.set_freq(freq_entry.get())
-        mf.set_power(st_pwr_level.get())
         pwr_start = int(st_pwr_level.get())
         pwr_end = int(end_pwr_level.get())
         pwr_step = int(pwr_step_level.get())
+        mf.set_power(pwr_start, pwr_end, pwr_step)
         print(f"Running at {freq_entry.get()}kHz from {st_pwr_level.get()}% power to {end_pwr_level.get()}% in \
                 {pwr_step_level.get()}% increments.")
     except ValueError:
         print('Values must be numbers')
     else:
+        mf.set_power(pwr_start, pwr_end, pwr_step)
         for i in range(pwr_start, pwr_end, pwr_step):
-            mf.set_power(i)            
-            sleep(1)
+#            mf.set_power(i)            
+#            sleep(1)
             progress['value'] = 100*i/(pwr_end - pwr_start) 
 
         print('Done')
