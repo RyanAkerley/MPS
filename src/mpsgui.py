@@ -11,6 +11,14 @@ from tkinter import ttk
 import mpsfunc as mf
 from time import sleep
 
+import matplotlib as mpl
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.figure import Figure
+from matplotlib.backend_bases import key_press_handler
+
+import numpy as np
+
+
 def run_button_pressed():
     try:
         mf.set_freq(freq_entry.get())
@@ -49,19 +57,35 @@ main_window.option_add('*tearOff', FALSE)
 
 data = ttk.Frame(main_window)
 
+freqs = [25000, 75000, 125000, 175000, 225000, 275000]
+amps = [1, .33, .2, .14, .11, .091]
+phases = [0, -5, -7, -11, -14, -20]
+
 freq_plot_label = ttk.Label(data, text='Frequency')
 freq_plot_label.grid(column=1, row=0, sticky='ew', padx=5, pady=5)
 freq_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
+freq_plot_fig = Figure(figsize=(4, 2.5), dpi=100)
+freq_plot_fig.add_subplot(111).plot(freqs, amps)
+freq_plot_canvas = FigureCanvasTkAgg(freq_plot_fig, master=freq_plot)
+freq_plot_canvas.draw()
+freq_plot_canvas.get_tk_widget().grid(column=0, row=0)
 freq_plot.grid(column=0, columnspan=3, row=1, rowspan=3)
-freq_img = PhotoImage(file='freq.png')
-freq_plot.create_image(20, 20, anchor=NW, image=freq_img)
+#freq_img = PhotoImage(file='freq.png')
+#freq_plot.create_image(20, 20, anchor=NW, image=freq_img)
+
+
 
 phase_plot_label = ttk.Label(data, text='Phase')
 phase_plot_label.grid(column=4, row=0, sticky='ew', padx=5, pady=5)
+phase_plot_fig = Figure(figsize=(4, 2.5), dpi=100)
+phase_plot_fig.add_subplot(111).plot(freqs, phases)
 phase_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
+phase_plot_canvas = FigureCanvasTkAgg(phase_plot_fig, master=phase_plot)
+phase_plot_canvas.draw()
+phase_plot_canvas.get_tk_widget().grid(column=0, row=0)
 phase_plot.grid(column=3, columnspan=3, row=1, rowspan=3)
-phase_img = PhotoImage(file='phase.png')
-phase_plot.create_image(20, 20, anchor=NW, image=phase_img)
+#phase_img = PhotoImage(file='phase.png')
+#phase_plot.create_image(20, 20, anchor=NW, image=phase_img)
 
 mag_plot_label = ttk.Label(data, text='Magnetization')
 mag_plot_label.grid(column=1, row=4, sticky='ew', padx=5, pady=5)

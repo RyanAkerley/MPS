@@ -1,7 +1,11 @@
 import serial
+from serial.serialutil import SerialException
 
+try:
+    ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
+except SerialException:
+    print('No serial device detected')
 
-ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
 
 def export_csv():
     print('The data has been exported as a CSV file')
