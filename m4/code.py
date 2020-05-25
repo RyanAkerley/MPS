@@ -1,4 +1,4 @@
-# mpsfunc.py
+# code.py
 
 # Copyright Ryan Akerley
 
@@ -18,26 +18,31 @@
 
 
 
-import serial
-from serial.serialutil import SerialException
 
-try:
-    ser = serial.Serial('/dev/ttyACM0', 115200, timeout=1)
-except SerialException:
-    print('No serial device detected')
+from wavegen import Wavegen
+import supervisor
+import time
 
+def run():
+    wave = Wavegen()
+    freq = 440
+    pwr_start = 50
+    pwr_end = 50
+    pwr_step = 10
+    print("running")
 
-def export_csv():
-    print('The data has been exported as a CSV file')
+    while True:
+        if supervisor.runtime.serial_bytes_available:
+            val = input()
+            pwr_start = val[0]
+            pwr_end = val[1]
+            pwr_step = val[2]
+            print(val[0], val[1], val[2])
 
-def set_freq(drive_freq):
-    print(f'The drive frequency has been set to {drive_freq}')
+        power = pwr_start
+        while power <= pwr_end:
+            wave.update(freq, power)
+            power = power + pwr_step
+            time.sleep(0.2)
 
-def set_power(pwr_start, pwr_end, pwr_step):
-    ser.write(bytearray((pwr_start, pwr_end, pwr_step)))
-    ser_read = [0] * 3
-    ser_read = ser.read(3)
-    print(ser_read)
-
-
-
+run()
