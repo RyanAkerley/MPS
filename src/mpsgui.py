@@ -74,9 +74,12 @@ amps = [1, .33, .2, .14, .11, .091]
 phases = [0, -5, -7, -11, -14, -20]
 excite_field = []
 mag = []
-smpl_time = []
-field = []
+smpl_time = range(0,40,1)
+field = [0]*40
 
+##############################################################################
+# Display a plot of the amplitudes of the harmonics
+##############################################################################
 freq_plot_label = ttk.Label(data, text='Frequency')
 freq_plot_label.grid(column=1, row=0, sticky='ew', padx=5, pady=5)
 freq_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
@@ -87,8 +90,9 @@ freq_plot_canvas.draw()
 freq_plot_canvas.get_tk_widget().grid(column=0, row=0)
 freq_plot.grid(column=0, columnspan=3, row=1, rowspan=3)
 
-
-
+##############################################################################
+# Display a plot of the phase shifts of the harmonics
+##############################################################################
 phase_plot_label = ttk.Label(data, text='Phase')
 phase_plot_label.grid(column=4, row=0, sticky='ew', padx=5, pady=5)
 phase_plot_fig = Figure(figsize=(4, 2.5), dpi=100)
@@ -99,22 +103,35 @@ phase_plot_canvas.draw()
 phase_plot_canvas.get_tk_widget().grid(column=0, row=0)
 phase_plot.grid(column=3, columnspan=3, row=1, rowspan=3)
 
+##############################################################################
+# Display a plot of the magnetization vs excitation field
+##############################################################################
 mag_plot_label = ttk.Label(data, text='Magnetization')
 mag_plot_label.grid(column=1, row=4, sticky='ew', padx=5, pady=5)
 mag_plot_fig = Figure(figsize=(4, 2.5), dpi=100)
 mag_plot_fig.add_subplot(111).plot(excite_field, mag)
 mag_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
 mag_plot_canvas = FigureCanvasTkAgg(mag_plot_fig, master=mag_plot)
+mag_plot_canvas.draw()
+mag_plot_canvas.get_tk_widget().grid(column=0, row=0)
 mag_plot.grid(column=0, columnspan=3, row=5, rowspan=3)
 
+##############################################################################
+# Display a plot of magnetization over time
+##############################################################################
 field_plot_label = ttk.Label(data, text='Excitation Field')
 field_plot_label.grid(column=4, row=4, sticky='ew', padx=5, pady=5)
 field_plot_fig = Figure(figsize=(4, 2.5), dpi=100)
 field_plot_fig.add_subplot(111).plot(smpl_time, field)
 field_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
-field_plot = Canvas(data, width=400, height=250, relief='raised', borderwidth='2')
+field_plot_canvas = FigureCanvasTkAgg(field_plot_fig, master=field_plot)
+field_plot_canvas.draw()
+field_plot_canvas.get_tk_widget().grid(column=0, row=0)
 field_plot.grid(column=3, columnspan=3, row=5, rowspan=3)
 
+##############################################################################
+# Display the current from the current sensor
+##############################################################################
 amps = IntVar()
 amp_label = ttk.Label(data, text=(('current: '+str(amps.get())+' Amps')))
 amp_label.grid(column = 0, row=8, padx=5, pady=5, sticky='e')
