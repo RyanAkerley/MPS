@@ -34,10 +34,15 @@ def set_freq(drive_freq):
     print(f'The drive frequency has been set to {drive_freq}')
 
 def set_power(pwr_start, pwr_end, pwr_step):
-    ser.write(bytearray((pwr_start, pwr_end, pwr_step)))
-    ser_read = [0] * 3
-    ser_read = ser.read(3)
-    print(ser_read)
+    try:
+        ser.write(bytearray((pwr_start, pwr_end, pwr_step)))
+        ser_read = [0] * 3
+        ser_read = ser.read(3)
+        print(ser_read)
+    except NameError:
+        pass
 
+def set_serial_port(port='/dev/ttyACM0'):
+    pass
 
 

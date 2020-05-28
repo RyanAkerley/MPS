@@ -30,6 +30,7 @@ from matplotlib.backend_bases import key_press_handler
 
 import numpy as np
 
+serial_port = '/dev/ttyACM0'
 
 def run_button_pressed():
     try:
@@ -37,7 +38,7 @@ def run_button_pressed():
         pwr_start = int(st_pwr_level.get())
         pwr_end = int(end_pwr_level.get())
         pwr_step = int(pwr_step_level.get())
-        mf.set_power(pwr_start, pwr_end, pwr_step)
+        mf.set_serial_port(serial_port)
         print(f"Running at {freq_entry.get()}kHz from {st_pwr_level.get()}% power to {end_pwr_level.get()}% in \
                 {pwr_step_level.get()}% increments.")
     except ValueError:
